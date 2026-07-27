@@ -1,0 +1,39 @@
+{
+    "data_root": "dataset",
+    "datasets": {
+
+        "unsw_nb15": {
+            "source_name": "UNSW-NB15",
+
+            "root":"f7546561558c07c5_NFV3DATA-A11964_A11964",
+            "data_path": "/data/NF-UNSW-NB15-v3.csv",
+            "feature_path": "/data/NetFlow_v3_Features.csv"
+        },
+
+        "ton_iot": {
+            "source_name": "ToN-IoT",
+
+            "root":"02934b58528a226b_NFV3DATA-A11964_A11964",
+            "data_path": "/data/NF-ToN-IoT-v3.csv",
+            "feature_path": "/data/NetFlow_v3_Features.csv"
+        },
+
+        "bot_iot": {
+            "source_name": "BoT-IoT",
+
+            "root":"d509c9db7490cf92_NFV3DATA-A11964_A11964",
+            "data_path": "/data/NF-BoT-IoT-v3.csv",
+            "feature_path": "/data/NetFlow_v3_Features.csv"
+        },
+
+        "cse_cic_ids2018": {
+            "source_name": "CSE-CIC-IDS2018",
+            "root":"f78acbaa2afe1595_NFV3DATA-A11964_A11964",
+            "data_path": "/data/NF-CICIDS2018-v3.csv",
+            "feature_path": "/data/NetFlow_v3_Features.csv"
+        }
+
+    },
+
+    "processed_root": "processed"
+}
