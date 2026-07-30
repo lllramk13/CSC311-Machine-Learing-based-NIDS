@@ -8,6 +8,10 @@ TIMESTAMP_COLUMNS = {
     "FLOW_START_MILLISECONDS",
     "FLOW_END_MILLISECONDS",
 }
+NON_FINITE_COLUMNS = [
+    "SRC_TO_DST_SECOND_BYTES",
+    "DST_TO_SRC_SECOND_BYTES",
+]
 METADATA_COLUMNS = [
     "Attack",
     "Dataset",
@@ -127,3 +131,45 @@ def assign_splits(
         END AS Split
         """
     )
+
+
+def replace_non_finite(
+    flows: duckdb.DuckDBPyRelation,
+) -> duckdb.DuckDBPyRelation:
+    """Replace infinity with NULL in the affected throughput columns."""
+    replacements = ", ".join(
+        f"""
+        CASE
+            WHEN isfinite({sql_identifier(column)})
+                THEN {sql_identifier(column)}
+            ELSE NULL
+        END AS {sql_identifier(column)}
+        """
+        for column in NON_FINITE_COLUMNS
+    )
+    return flows.project(f"* REPLACE ({replacements})")
+
+
+def fit_median_imputer(
+    train_flows: duckdb.DuckDBPyRelation,
+) -> dict[str, float]:
+    """Calculate replacement medians using training data only."""
+    columns = ", ".join(
+        f"median({sql_identifier(column)}) AS {sql_identifier(column)}"
+        for column in NON_FINITE_COLUMNS
+    )
+    values = train_flows.aggregate(columns).fetchone()
+    return dict(zip(NON_FINITE_COLUMNS, values))
+
+
+def apply_median_imputer(
+    flows: duckdb.DuckDBPyRelation,
+    medians: dict[str, float],
+) -> duckdb.DuckDBPyRelation:
+    """Fill NULL values using medians learned from training data."""
+    replacements = ", ".join(
+        f"coalesce({sql_identifier(column)}, {value}) "
+        f"AS {sql_identifier(column)}"
+        for column, value in medians.items()
+    )
+    return flows.project(f"* REPLACE ({replacements})")
