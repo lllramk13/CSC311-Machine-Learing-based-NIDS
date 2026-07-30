@@ -8,6 +8,7 @@ from sklearn.metrics import (
     f1_score,
     confusion_matrix,
 )
+import joblib
 
 def load_data():
     data = None 
@@ -15,6 +16,7 @@ def load_data():
 
 def train_model(
     model,
+    name,
     X_train,
     y_train,
     hyperparams,
@@ -23,6 +25,7 @@ def train_model(
     scoring="accuracy",
     random_state=42,
 ):
+    # name: what to save model as 
     # TODO: Change n_jobs to desired amount
     # TODO: Put code to download model.
     # cv: cross validation number 
@@ -50,6 +53,8 @@ def train_model(
         "best_params": random_search.best_params_,
         "loss_curve": getattr(best_model, "loss_curve_", None),
     }
+
+    joblib.dump(best_model, f"models/{name}.joblib")
 
     return results
 
