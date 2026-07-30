@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.metrics import (
     accuracy_score,
     precision_score,
@@ -16,21 +17,39 @@ def train_model(
     model,
     X_train,
     y_train,
-    X_valid=None,
-    y_valid=None,
+    hyperparams,
+    n_iter=20,
+    cv=5,
+    scoring="accuracy",
+    random_state=42,
 ):
-    model.fit(X_train, y_train)
+    # TODO: Change n_jobs to desired amount
+    # TODO: Put code to download model.
+    # cv: cross validation number 
+    # scoring: metric to see what is the best model
 
-    train_accuracy = model.score(X_train, y_train)
+    random_search = RandomizedSearchCV(
+        estimator=model,
+        param_distributions=hyperparams,
+        n_iter=n_iter,
+        cv=cv,
+        scoring=scoring,
+        random_state=random_state,
+        n_jobs=1,
+        refit=True,
+    )
+
+    random_search.fit(X_train, y_train)
+
+    best_model = random_search.best_estimator_
 
     results = {
-        "model": model,
-        "train_accuracy": train_accuracy,
-        "loss_curve": getattr(model, "loss_curve_", None),
+        "model": best_model,
+        "train_accuracy": best_model.score(X_train, y_train),
+        "cv_accuracy": random_search.best_score_,
+        "best_params": random_search.best_params_,
+        "loss_curve": getattr(best_model, "loss_curve_", None),
     }
-
-    if X_valid is not None and y_valid is not None:
-        results["validation_accuracy"] = model.score(X_valid, y_valid)
 
     return results
 
