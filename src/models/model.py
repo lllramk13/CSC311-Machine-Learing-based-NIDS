@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.model_selection import RandomizedSearchCV
@@ -10,9 +13,32 @@ from sklearn.metrics import (
 )
 import joblib
 
-def load_data():
-    data = None 
-    return data 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT.parent) not in sys.path:
+    sys.path.append(str(REPO_ROOT.parent))
+
+from src.data.get_data import prepare_sklearn_data
+
+
+def load_data(
+    datasets=None,
+    labels=None,
+    attacks=None,
+    train_percentage=80,
+    sample_percentage=1.0,
+    include_ip=False,
+    include_timestamps=False,
+):
+    X_train, X_test, y_train, y_test = prepare_sklearn_data(
+        datasets=datasets,
+        labels=labels,
+        attacks=attacks,
+        train_percentage=train_percentage,
+        sample_percentage=sample_percentage,
+        include_ip=include_ip,
+        include_timestamps=include_timestamps,
+    )
+    return X_train, y_train, X_test, y_test
 
 def train_model(
     model,
@@ -26,8 +52,6 @@ def train_model(
     random_state=42,
 ):
     # name: what to save model as 
-    # TODO: Change n_jobs to desired amount
-    # TODO: Put code to download model.
     # cv: cross validation number 
     # scoring: metric to see what is the best model
 
@@ -38,7 +62,7 @@ def train_model(
         cv=cv,
         scoring=scoring,
         random_state=random_state,
-        n_jobs=1,
+        n_jobs=-1,
         refit=True,
     )
 
