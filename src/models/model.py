@@ -46,15 +46,11 @@ def train_model(
     X_train,
     y_train,
     hyperparams,
-    n_iter=20,
-    cv=5,
+    n_iter=5,
+    cv=3,
     scoring="accuracy",
     random_state=42,
 ):
-    # name: what to save model as 
-    # cv: cross validation number 
-    # scoring: metric to see what is the best model
-
     random_search = RandomizedSearchCV(
         estimator=model,
         param_distributions=hyperparams,
@@ -63,6 +59,7 @@ def train_model(
         scoring=scoring,
         random_state=random_state,
         n_jobs=-1,
+        verbose=2,
         refit=True,
     )
 

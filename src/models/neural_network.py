@@ -8,9 +8,9 @@ def build_model(
     solver="adam",
     learning_rate_init=0.001,
     alpha=0.0001,
-    batch_size=32,
-    max_iter=500,
-    early_stopping=False,
+    batch_size=512,
+    max_iter=100,
+    early_stopping=True,
     random_state=42,
 ):
     return MLPClassifier(
@@ -33,16 +33,26 @@ if __name__ == "__main__":
 
     hyperparams = {
     "hidden_layer_sizes": [
-        (50,),
         (100,),
         (100, 50),
-        (200, 100),
     ],
-    "activation": ["relu", "tanh"],
-    "alpha": loguniform(1e-5, 1e-2),
-    "learning_rate_init": loguniform(1e-4, 1e-2),
-    "batch_size": randint(32, 256),
-    "early_stopping": [True],
+    "activation": [
+        "relu",
+    ],
+    "alpha": [
+        0.0001,
+        0.001,
+    ],
+    "learning_rate_init": [
+        0.001,
+    ],
+    "batch_size": [
+        256,
+        512,
+    ],
+    "early_stopping": [
+        True,
+    ],
     }
 
     results = train_model(
