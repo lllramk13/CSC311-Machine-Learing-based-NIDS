@@ -27,7 +27,11 @@ def build_model(
 
 if __name__ == "__main__":
     print("I am running!")
-    X_train, y_train, X_test, y_test = load_data()
+    X_train, y_train, X_test, y_test = load_data(
+        datasets=["cse_cic_ids2018"],
+        target="attack",
+        sample_percentage=50,
+    )
 
     model = build_model()
 
@@ -70,6 +74,7 @@ if __name__ == "__main__":
     print("CV accuracy:", results["cv_accuracy"])
 
     print("Test accuracy:", metrics["accuracy"])
+    print("Class order:", metrics["classes"])
     print("Confusion Matrix:")
     print(metrics["confusion_matrix"])
 

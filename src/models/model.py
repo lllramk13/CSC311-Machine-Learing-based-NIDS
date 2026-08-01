@@ -24,6 +24,7 @@ def load_data(
     datasets=None,
     labels=None,
     attacks=None,
+    target="label",
     train_percentage=80,
     sample_percentage=1.0,
     include_ip=False,
@@ -33,6 +34,7 @@ def load_data(
         datasets=datasets,
         labels=labels,
         attacks=attacks,
+        target=target,
         train_percentage=train_percentage,
         sample_percentage=sample_percentage,
         include_ip=include_ip,
@@ -58,7 +60,7 @@ def train_model(
         cv=cv,
         scoring=scoring,
         random_state=random_state,
-        n_jobs=-1,
+        n_jobs=1,
         verbose=2,
         refit=True,
     )
@@ -75,7 +77,9 @@ def train_model(
         "loss_curve": getattr(best_model, "loss_curve_", None),
     }
 
-    joblib.dump(best_model, f"models/{name}.joblib")
+    MODEL_DIR = REPO_ROOT.parent / "models"
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    joblib.dump(best_model, MODEL_DIR / f"{name}.joblib")
 
     return results
 
@@ -84,10 +88,17 @@ def evaluate_model(model, X_test, y_test):
 
     return {
         "accuracy": accuracy_score(y_test, y_pred),
-        "precision": precision_score(y_test, y_pred, average="weighted"),
-        "recall": recall_score(y_test, y_pred, average="weighted"),
-        "f1_score": f1_score(y_test, y_pred, average="weighted"),
+        "precision": precision_score(
+            y_test, y_pred, average="weighted", zero_division=0
+        ),
+        "recall": recall_score(
+            y_test, y_pred, average="weighted", zero_division=0
+        ),
+        "f1_score": f1_score(
+            y_test, y_pred, average="weighted", zero_division=0
+        ),
         "confusion_matrix": confusion_matrix(y_test, y_pred),
+        "classes": model.classes_,
     }
 
 def predict_model(model, X):

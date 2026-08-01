@@ -8,6 +8,8 @@ and the processed to the processed folder path in the dataset folder. the whole 
                 labels=[0, 1], 0 is only benign flow, 1 is only attack flow, [0, 1] is all flow
                 attack=[""], if no Benign and only attack type, then the label will only be 1, since they are all attack.
                   choice attack type: Benign, Bot, Brute_Force_-Web, Brute_Force_-XSS, DDOS_attack-HOIC, DDOS_attack-LOIC-UDP, DDoS_attacks-LOIC-HTTP, DoS_attacks-GoldenEye, DoS_attacks-Hulk, DoS_attacks-SlowHTTPTest, DoS_attacks-Slowloris, FTP-BruteForce, Infilteration, SQL_Injection, SSH-Bruteforce
+                target="label" for benign/attack binary classification, or
+                  target="attack" for attack-type multiclass classification
                 train_percentage=int, if 70 then 70% train, 30 =% test
                 sample_percentage=int, =100 means use all data of chosen above
                 include_ip=bool, dataset all have 54 features, i romved ip and timestamp as they may overfit our model but you can add them back here if you guys needed it
@@ -39,11 +41,21 @@ def prepare_sklearn_data(
     datasets: Iterable[str] | None = None,
     labels: Iterable[int] | None = None,
     attacks: Iterable[str] | None = None,
+    target: str = "label",
     train_percentage: int = 80,
     sample_percentage: float = 1.0,
     include_ip: bool = False,
     include_timestamps: bool = False,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
+    target_columns = {
+        "label": "Label",
+        "attack": "Attack",
+    }
+    try:
+        target_column = target_columns[target.lower()]
+    except (AttributeError, KeyError) as error:
+        raise ValueError("target must be either 'label' or 'attack'") from error
+
     flows = load_flows(
         datasets=datasets,
         labels=labels,
@@ -85,7 +97,7 @@ def prepare_sklearn_data(
         include_timestamps=include_timestamps,
     )
     selected_columns = ", ".join(
-        sql_identifier(column) for column in [*features, "Label"]
+        sql_identifier(column) for column in [*features, target_column]
     )
 
     train_frame = train_flows.project(selected_columns).df()
@@ -93,7 +105,7 @@ def prepare_sklearn_data(
 
     X_train = train_frame[features]
     X_test = test_frame[features]
-    y_train = train_frame["Label"]
-    y_test = test_frame["Label"]
+    y_train = train_frame[target_column]
+    y_test = test_frame[target_column]
 
     return X_train, X_test, y_train, y_test
