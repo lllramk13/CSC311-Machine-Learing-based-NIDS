@@ -16,7 +16,7 @@ def build_model(
     )
 
 if __name__ == "__main__":
-    X_train, y_train, X_test, y_test = load_data()
+    X_train, y_train, X_test, y_test = load_data(sample_percentage=50, target="attack")
 
     model = build_model()
 
@@ -31,12 +31,12 @@ if __name__ == "__main__":
         y_train=y_train,
         hyperparams=hyperparams,
         n_iter=30,
-        scoring="roc_auc",
+        scoring="accuracy",
     )
 
     metrics = evaluate_model(results["model"], X_test, y_test)
 
     print("Best params:", results["best_params"])
-    print("cross validation roc auc:", results["cv_accuracy"])
+    print("cross validation acc:", results["cv_accuracy"])
     print("test acc:", metrics["accuracy"])
     print("Confusion matrix:", metrics["confusion_matrix"])
