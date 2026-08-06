@@ -16,7 +16,7 @@ def build_model(
     )
 
 if __name__ == "__main__":
-    X_train, y_train, X_test, y_test = load_data(sample_percentage=50, target="attack")
+    X_train, y_train, X_test, y_test = load_data(sample_percentage=50, target="attack", datasets=["cse_cic_ids2018"])
 
     model = build_model()
 
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     results = train_model(
         model=model,
-        name="decision_tree",
+        name="decision_tree_multiclass",
         X_train=X_train,
         y_train=y_train,
         hyperparams=hyperparams,
