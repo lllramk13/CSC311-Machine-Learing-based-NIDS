@@ -22,18 +22,18 @@ METADATA_COLUMNS = [
 ]
 
 
-def sql_string(value: str) -> str:
+def sql_string(value):
     return value.replace("'", "''")
 
 
-def sql_identifier(value: str) -> str:
+def sql_identifier(value):
     return '"' + value.replace('"', '""') + '"'
 
 
 def model_features(
     include_ip: bool = False,
     include_timestamps: bool = False,
-) -> list[str]:
+):
     # can add more if needed
 
     features = load_features()
@@ -105,7 +105,6 @@ def assign_splits(
     train_percentage: int = 70,
     validation_percentage: int = 15,
 ):
-    """Assign flows to deterministic train, validation, and test splits."""
     split_number = """
         hash(
             Dataset,
@@ -136,7 +135,6 @@ def assign_splits(
 def replace_non_finite(
     flows: duckdb.DuckDBPyRelation,
 ) -> duckdb.DuckDBPyRelation:
-    """Replace infinity with NULL in the affected throughput columns."""
     replacements = ", ".join(
         f"""
         CASE
@@ -153,7 +151,6 @@ def replace_non_finite(
 def fit_median_imputer(
     train_flows: duckdb.DuckDBPyRelation,
 ) -> dict[str, float]:
-    """Calculate replacement medians using training data only."""
     columns = ", ".join(
         f"median({sql_identifier(column)}) AS {sql_identifier(column)}"
         for column in NON_FINITE_COLUMNS
@@ -166,7 +163,6 @@ def apply_median_imputer(
     flows: duckdb.DuckDBPyRelation,
     medians: dict[str, float],
 ) -> duckdb.DuckDBPyRelation:
-    """Fill NULL values using medians learned from training data."""
     replacements = ", ".join(
         f"coalesce({sql_identifier(column)}, {value}) "
         f"AS {sql_identifier(column)}"

@@ -97,7 +97,12 @@ def evaluate_model(model, X_test, y_test):
         "f1_score": f1_score(
             y_test, y_pred, average="weighted", zero_division=0
         ),
-        "confusion_matrix": confusion_matrix(y_test, y_pred),
+
+        "confusion_matrix": confusion_matrix(
+            y_test,
+            y_pred,
+            labels=model.classes_,
+        ),
         "classes": model.classes_,
     }
 

@@ -1,4 +1,6 @@
 duckdb
+matplotlib
 pandas
 scikit-learn
+seaborn
 xgboost

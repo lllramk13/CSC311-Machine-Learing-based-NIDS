@@ -4,11 +4,11 @@ import duckdb
 from src.config import load_config
 
 
-def sql_string(value: str | Path) -> str:
+def sql_string(value: str | Path):
     return str(value).replace("'", "''")
 
 
-def convert_dataset(dataset: dict, output_path: Path) -> None:
+def convert_dataset(dataset: dict, output_path: Path):
     output_path.parent.mkdir(parents=True, exist_ok=True)
     temporary_path = output_path.with_suffix(".tmp.parquet")
     temporary_path.unlink(missing_ok=True)
@@ -41,7 +41,7 @@ def convert_dataset(dataset: dict, output_path: Path) -> None:
     temporary_path.replace(output_path)
 
 
-def main() -> None:
+def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--dataset",

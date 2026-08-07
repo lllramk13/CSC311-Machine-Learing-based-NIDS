@@ -8,8 +8,7 @@ from src.config import PROJECT_ROOT, load_config
 REPORT_DIR = PROJECT_ROOT / "reports"
 
 
-def count_classes(csv_path: Path) -> tuple[Counter[str], Counter[str]]:
-    """Count labels and attack types in one CSV file."""
+def count_classes(csv_path):
     label_counts: Counter[str] = Counter()
     attack_counts: Counter[str] = Counter()
 
@@ -30,16 +29,14 @@ def write_distribution(
     output_path: Path,
     rows: list[tuple[str, str, int, float]],
     category_name: str,
-) -> None:
-    """Write one distribution report."""
+):
     with output_path.open("w", encoding="utf-8", newline="") as file:
         writer = csv.writer(file)
         writer.writerow(["Dataset", category_name, "Count", "Percentage"])
         writer.writerows(rows)
 
 
-def main() -> None:
-    """Scan all configured datasets and write distribution reports."""
+def main():
     config = load_config()
     label_rows: list[tuple[str, str, int, float]] = []
     attack_rows: list[tuple[str, str, int, float]] = []
